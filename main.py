@@ -22,29 +22,66 @@ class Hero(sprite.Sprite):
 
     def reset(self):
         window.blit(self.image,(self.rect.x, self.rect.y))
+bullets = []
 
-class Player(Hero):
+
+
+class Bulet(Hero):
+    def move(self):
+        self.rect.y -= self.speed
+        if self.rect.y > -60:
+            self.kill()  
+
+
+             
+class Player(Hero): 
     def move(self):
         keys = key.get_pressed()
         if keys[K_a] and self.rect.x > 5:
             self.rect.x -= self.speed
-        if keys[K_d] and self.rect.x <700:
+        if keys[K_d] and self.rect.x <620:
             self.rect.x += self.speed
+
+
+    def fire(self):
+        bullet = Bulet(self.rect.centerx, self.rect.y , 10,10,10, "bullet.png")
+        bullets.append(bullet)
+counter = 0 
+monster_kill = 0
+
 
 
 class Enemy (Hero):
     def move(self):
         
         self.rect.y += self.speed
+        global counter
         if self.rect.y >560:
-            self.rect.x = random.randint(100,600)
+            counter+=1
+            self.rect.x = random.randint(100,565)
+            self.speed = random.randint(1,4)
             self.rect.y = -100
 
 
-Enemy1= Enemy(350, -100, 150, 50, 3, "ufo.png" )
 
-rocket1=Player(300, 340 , 100,150,5)
 
+        
+
+
+rocket1=Player(300, 340 , 80,130,5)
+
+
+enemys = []
+
+for i in range(5):
+    Enemy1= Enemy(random.randint(100,565), -100, 100, 50, random.randint(1,4), "ufo.png" )
+    enemys.append(Enemy1)
+
+
+font.init()
+
+font1 = font.Font(None, 50)
+font2= font.Font(None, 50)
 Game = True
 while Game:
     window.blit(background, (0, 0))
@@ -52,12 +89,30 @@ while Game:
     Enemy1.reset()
     rocket1.move()
     Enemy1.move()
+   
+    window.blit(font1.render(f"Лічильник: {counter}", True, (255,255,255)), (15,10))
+    window.blit(font2.render(f"Збито: {monster_kill}", True, (255,255,255)), (15,50))
 
 
+
+
+    for i in enemys:
+        i.reset()
+        i.move()
+
+
+
+    for b in bullets:
+        b.reset()
+        b.move()
 
     for e in event.get():
         if e.type == QUIT:
             Game = False
+
+        if e.type == KEYDOWN:
+            if e.key == K_SPACE:
+                rocket1.fire()
 
 
 
